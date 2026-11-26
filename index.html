@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PageQA AI — Instant AI Answers in Chrome Side Panel</title>
+    <meta
+      name="description"
+      content="Analyze webpage MCQs, checkboxes, diagrams, and math formulas instantly in Chrome Side Panel using Google AI Studio (Gemini) with automatic Groq & OpenRouter free backups."
+    />
+    <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Subtle Grid & Aurora Background -->
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="aurora aurora-1" aria-hidden="true"></div>
+    <div class="aurora aurora-2" aria-hidden="true"></div>
+
+    <!-- Floating Glass Navbar -->
+    <header class="navbar">
+      <div class="container nav-shell">
+        <a href="#" class="brand">
+          <img src="assets/icon128.png" alt="PageQA AI" class="brand-logo" />
+          <span class="brand-name">PageQA <strong>AI</strong></span>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#features">Features</a>
+          <a href="#install">Install</a>
+          <a href="#shortcuts">Shortcuts</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="nav-right">
+          <a
+            href="downloads/pageqa-ai-extension.zip"
+            download
+            class="btn btn-primary btn-sm nav-dl-btn js-download-btn"
+          >
+            <span>Download</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </a>
+          <button
+            id="mobileMenuBtn"
+            class="mobile-menu-btn"
+            type="button"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+          >
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Drawer -->
+      <div id="mobileDrawer" class="mobile-drawer hidden">
+        <a href="#features" class="mobile-link">Features</a>
+        <a href="#install" class="mobile-link">Install Guide</a>
+        <a href="#shortcuts" class="mobile-link">Shortcuts</a>
+        <a href="#faq" class="mobile-link">FAQ</a>
+        <a
+          href="downloads/pageqa-ai-extension.zip"
+          download
+          class="btn btn-primary full-width js-download-btn"
+        >
+          Download Extension (.zip)
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-center">
+            <div class="eyebrow">
+              <span class="pulse-dot"></span>
+              <span>Chrome • Brave • Edge • Arc — Manifest V3</span>
+            </div>
+
+            <h1>
+              Solve Any Webpage Question<br />
+              <span class="gradient-text">Without Leaving Your Tab.</span>
+            </h1>
+
+            <p class="hero-subtitle">
+              A sleek Chrome Side Panel powered by <strong>Google AI Studio (Gemini)</strong> with
+              automatic <strong>Groq</strong> &amp; <strong>OpenRouter</strong> free backups. Reads
+              text, radio buttons, checkboxes, diagrams, and cropped screen snips — then highlights
+              the right answer directly on the page.
+            </p>
+
+            <div class="hero-cta">
+              <a
+                href="downloads/pageqa-ai-extension.zip"
+                download
+                class="btn btn-primary btn-xl js-download-btn"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Download Extension (.zip)</span>
+              </a>
+              <a href="#install" class="btn btn-glass btn-xl">60-Second Install Guide</a>
+            </div>
+
+            <div class="trust-bar">
+              <span class="trust-chip" id="releaseVersion">v1.0.0</span>
+              <span class="trust-chip" id="releaseSize">85 KB Protected Build</span>
+              <span class="trust-chip">100% Local API Keys</span>
+              <span class="trust-chip">Free Tier Ready</span>
+            </div>
+          </div>
+
+          <!-- Interactive Browser + Side Panel Preview -->
+          <div class="demo-frame reveal">
+            <div class="demo-topbar">
+              <div class="window-dots">
+                <span class="dot-red"></span>
+                <span class="dot-yellow"></span>
+                <span class="dot-green"></span>
+              </div>
+              <div class="url-bar">quiz.example.com/practice-test</div>
+              <div class="demo-tabs" role="tablist" aria-label="Demo Modes">
+                <button class="demo-tab active" data-demo="single" type="button">📄 Single MCQ</button>
+                <button class="demo-tab" data-demo="multi" type="button">☑️ Multi-Select</button>
+                <button class="demo-tab" data-demo="snip" type="button">✂️ Snip Vision</button>
+              </div>
+            </div>
+
+            <div class="demo-split">
+              <!-- Left: Simulated Webpage -->
+              <div class="demo-webpage">
+                <div class="web-label">LIVE WEBPAGE PREVIEW</div>
+                <div id="demoWebContent" class="web-content"></div>
+              </div>
+
+              <!-- Right: Simulated Chrome Side Panel -->
+              <aside class="demo-sidepanel">
+                <div class="sp-head">
+                  <div class="sp-brand">
+                    <img src="assets/icon128.png" alt="" />
+                    <div>
+                      <div class="sp-title">PageQA AI</div>
+                      <div id="demoModelBadge" class="sp-status">Auto: gemini-3-flash</div>
+                    </div>
+                  </div>
+                  <span class="sp-auto-pill">⚡ Auto-Next</span>
+                </div>
+
+                <div class="sp-actions">
+                  <span class="sp-btn sp-b1">📄 Text</span>
+                  <span class="sp-btn sp-b2">📸 Vision</span>
+                  <span class="sp-btn sp-b3">✂️ Snip</span>
+                </div>
+
+                <div id="demoPanelCard" class="sp-card"></div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bento Features Section -->
+      <section id="features" class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag">CAPABILITIES</span>
+            <h2>Everything You Need. Zero Tab Switching.</h2>
+            <p>Designed to stay fast, accurate, and unobtrusive on any quiz, form, or study portal.</p>
+          </div>
+
+          <div class="bento-grid">
+            <article class="bento-card bento-wide reveal">
+              <div class="bento-icon icon-indigo">🛡️</div>
+              <h3>Auto Model Discovery + Free Backup API Chain</h3>
+              <p>
+                Automatically detects and picks the newest available Gemini model for your key. If
+                Gemini ever hits a rate limit or high-demand spike, PageQA AI seamlessly falls back
+                to your free <strong>Groq</strong> (Llama 3.3 / Llama 4 Vision) or
+                <strong>OpenRouter</strong> backup key without losing a beat.
+              </p>
+              <div class="chain-pills">
+                <span class="chain-step active">1. Gemini Auto</span>
+                <span class="chain-arrow">→</span>
+                <span class="chain-step">2. Groq Free</span>
+                <span class="chain-arrow">→</span>
+                <span class="chain-step">3. OpenRouter Free</span>
+              </div>
+            </article>
+
+            <article class="bento-card reveal">
+              <div class="bento-icon icon-sky">✂️</div>
+              <h3>Area Snip &amp; Screen Vision</h3>
+              <p>
+                Drag a crosshair box over any math formula, geometry diagram, or image question to
+                crop and analyze with multimodal Vision AI.
+              </p>
+            </article>
+
+            <article class="bento-card reveal">
+              <div class="bento-icon icon-emerald">✨</div>
+              <h3>On-Page Highlight &amp; Locate</h3>
+              <p>
+                Marks recommended answers directly on the webpage with a green outline and
+                <code>✓ AI</code> badge. Click <strong>Locate</strong> to scroll &amp; pulse.
+              </p>
+            </article>
+
+            <article class="bento-card reveal">
+              <div class="bento-icon icon-violet">☑️</div>
+              <h3>Radio &amp; Multi-Select Smart Mode</h3>
+              <p>
+                Detects single-choice radio buttons and multi-select checkboxes (including Google
+                Forms &amp; SPAs) so every right option gets highlighted.
+              </p>
+            </article>
+
+            <article class="bento-card reveal">
+              <div class="bento-icon icon-amber">⚡</div>
+              <h3>Auto-Detect Next Question</h3>
+              <p>
+                Enable <strong>Auto-Next</strong> during multi-page quizzes. Clicking "Next"
+                automatically detects the new question and solves it.
+              </p>
+            </article>
+
+            <article class="bento-card reveal">
+              <div class="bento-icon icon-rose">⏹</div>
+              <h3>Instant Stop &amp; Clear All</h3>
+              <p>
+                Clicked by accident? Hit <strong>Stop</strong> (or <code>Esc</code>) to abort the
+                live API request immediately. Wipe answers &amp; marks in one click.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Install Steps -->
+      <section id="install" class="section section-tinted">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag">QUICK SETUP</span>
+            <h2>Install in Under 60 Seconds</h2>
+            <p>Works on Chrome, Brave, Edge, Arc, Opera, and any Chromium-based browser.</p>
+          </div>
+
+          <div class="steps-grid">
+            <div class="step-card reveal">
+              <div class="step-badge">1</div>
+              <h3>Download &amp; Unzip</h3>
+              <p>
+                Click Download to get <code>pageqa-ai-extension.zip</code> and extract it to a
+                permanent folder.
+              </p>
+            </div>
+            <div class="step-card reveal">
+              <div class="step-badge">2</div>
+              <h3>Developer Mode</h3>
+              <p>
+                Open <code>chrome://extensions</code> in your browser and switch
+                <strong>Developer mode</strong> ON (top-right).
+              </p>
+            </div>
+            <div class="step-card reveal">
+              <div class="step-badge">3</div>
+              <h3>Load Unpacked</h3>
+              <p>
+                Click <strong>Load unpacked</strong>, pick the extracted folder, and pin the PageQA
+                AI icon to your toolbar.
+              </p>
+            </div>
+            <div class="step-card reveal">
+              <div class="step-badge">4</div>
+              <h3>Connect Free Key</h3>
+              <p>
+                Open Settings, paste your free
+                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer"
+                  >Google AI Studio</a
+                >
+                key (plus optional Groq / OpenRouter keys), and Save!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Keyboard Shortcuts -->
+      <section id="shortcuts" class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag">WORKFLOW</span>
+            <h2>Keyboard-First Speed</h2>
+            <p>Trigger any mode from any webpage without touching the mouse.</p>
+          </div>
+
+          <div class="shortcuts-grid">
+            <div class="shortcut-card reveal">
+              <kbd>Alt + Q</kbd>
+              <div>
+                <strong>Analyze Text</strong>
+                <span>Reads page text &amp; options</span>
+              </div>
+            </div>
+            <div class="shortcut-card reveal">
+              <kbd>Alt + V</kbd>
+              <div>
+                <strong>Screen Vision</strong>
+                <span>Captures full visible tab</span>
+              </div>
+            </div>
+            <div class="shortcut-card reveal">
+              <kbd>Alt + S</kbd>
+              <div>
+                <strong>Snip Crop</strong>
+                <span>Drag area to analyze</span>
+              </div>
+            </div>
+            <div class="shortcut-card reveal">
+              <kbd>Alt + C</kbd>
+              <div>
+                <strong>Clear All</strong>
+                <span>Clears panel &amp; highlights</span>
+              </div>
+            </div>
+            <div class="shortcut-card reveal">
+              <kbd>Esc</kbd>
+              <div>
+                <strong>Instant Stop</strong>
+                <span>Aborts request or snip</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" class="section section-tinted">
+        <div class="container faq-container">
+          <div class="section-header">
+            <span class="section-tag">FAQ</span>
+            <h2>Frequently Asked Questions</h2>
+          </div>
+
+          <div class="faq-list">
+            <details class="faq-item" open>
+              <summary>Is PageQA AI free to use?</summary>
+              <p>
+                Yes! The extension is free and uses your own free-tier API keys from Google AI
+                Studio, Groq, or OpenRouter.
+              </p>
+            </details>
+            <details class="faq-item">
+              <summary>Are my API keys safe?</summary>
+              <p>
+                100%. Your keys are stored locally inside Chrome's private
+                <code>chrome.storage.local</code> and sent directly from your browser to Google /
+                Groq / OpenRouter — never to any third-party server.
+              </p>
+            </details>
+            <details class="faq-item">
+              <summary>What happens if Gemini hits a rate limit?</summary>
+              <p>
+                PageQA AI first tries other available Gemini models automatically. If all Gemini
+                models are busy, it seamlessly switches to your Groq or OpenRouter backup key.
+              </p>
+            </details>
+            <details class="faq-item">
+              <summary>Does it work on Bangla / Banglish explanations?</summary>
+              <p>
+                Yes! In Settings you can pick <strong>Banglish</strong>, <strong>Bangla (বাংলা)</strong>,
+                or <strong>English</strong> for explanations while keeping answers matched to the
+                webpage's original language.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="section">
+        <div class="container">
+          <div class="cta-box reveal">
+            <div class="cta-copy">
+              <h2>Ready to Supercharge Your Browser?</h2>
+              <p>Download the protected Manifest V3 build and start analyzing in 60 seconds.</p>
+            </div>
+            <a
+              href="downloads/pageqa-ai-extension.zip"
+              download
+              class="btn btn-primary btn-xl js-download-btn"
+            >
+              Download Extension (.zip)
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <img src="assets/icon128.png" alt="" />
+          <span>© <span id="year"></span> PageQA AI</span>
+        </div>
+        <span class="footer-note">Chrome Manifest V3 • Privacy-First Local Storage</span>
+      </div>
+    </footer>
+
+    <!-- Download Toast -->
+    <div id="downloadToast" class="dl-toast hidden">
+      ✅ Downloading <strong>pageqa-ai-extension.zip</strong> — unzip &amp; load in
+      <code>chrome://extensions</code>!
+    </div>
+
+    <script>
+      // Year
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Dynamic Release Info
+      fetch('downloads/release.json')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((meta) => {
+          if (!meta) return;
+          if (meta.version) document.getElementById('releaseVersion').textContent = 'v' + meta.version;
+          if (meta.sizeKb)
+            document.getElementById('releaseSize').textContent = meta.sizeKb + ' KB Protected Build';
+        })
+        .catch(() => {});
+
+      // Mobile Drawer Toggle
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      const mobileDrawer = document.getElementById('mobileDrawer');
+      menuBtn.addEventListener('click', () => {
+        const isOpen = !mobileDrawer.classList.contains('hidden');
+        mobileDrawer.classList.toggle('hidden', isOpen);
+        menuBtn.classList.toggle('open', !isOpen);
+        menuBtn.setAttribute('aria-expanded', String(!isOpen));
+      });
+      document.querySelectorAll('.mobile-link').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileDrawer.classList.add('hidden');
+          menuBtn.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // Download Toast Feedback
+      const dlToast = document.getElementById('downloadToast');
+      let dlTimer = null;
+      document.querySelectorAll('.js-download-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (dlTimer) clearTimeout(dlTimer);
+          dlToast.classList.remove('hidden');
+          dlTimer = setTimeout(() => dlToast.classList.add('hidden'), 4500);
+        });
+      });
+
+      // Interactive Hero Demo Switcher
+      const DEMOS = {
+        single: {
+          badge: 'Auto: gemini-3-flash',
+          webHtml: `
+            <div class="w-q">1. Which HTTP status code indicates a resource was NOT found?</div>
+            <div class="w-opt"><span class="w-radio"></span> A) 200 OK</div>
+            <div class="w-opt"><span class="w-radio"></span> B) 301 Moved Permanently</div>
+            <div class="w-opt w-opt-hit"><span class="w-radio active"></span> C) 404 Not Found <span class="w-ai-tag">✓ AI</span></div>
+            <div class="w-opt"><span class="w-radio"></span> D) 500 Internal Server Error</div>
+          `,
+          panelHtml: `
+            <div class="sp-card-top">
+              <div class="sp-badges"><span class="sp-q">Q1</span><span class="sp-type-s">Single Choice</span></div>
+              <span class="sp-conf">High Confidence</span>
+            </div>
+            <div class="sp-qtext">Which HTTP status code indicates a resource was NOT found?</div>
+            <div class="sp-ans"><span>✓ C) 404 Not Found</span><span class="sp-loc">Locate</span></div>
+            <div class="sp-exp">404 Not Found means the requested URL does not exist on the server.</div>
+          `,
+        },
+        multi: {
+          badge: 'Auto: gemini-3-flash',
+          webHtml: `
+            <div class="w-q">2. Which are valid JavaScript primitive types? (Select all)</div>
+            <div class="w-opt w-opt-hit"><span class="w-check active">✓</span> Boolean <span class="w-ai-tag">✓ AI</span></div>
+            <div class="w-opt"><span class="w-check"></span> Array</div>
+            <div class="w-opt w-opt-hit"><span class="w-check active">✓</span> Symbol <span class="w-ai-tag">✓ AI</span></div>
+            <div class="w-opt w-opt-hit"><span class="w-check active">✓</span> BigInt <span class="w-ai-tag">✓ AI</span></div>
+          `,
+          panelHtml: `
+            <div class="sp-card-top">
+              <div class="sp-badges"><span class="sp-q">Q2</span><span class="sp-type-m">Multi-Select (3)</span></div>
+              <span class="sp-conf">High Confidence</span>
+            </div>
+            <div class="sp-qtext">Which are valid JavaScript primitive types?</div>
+            <div class="sp-ans"><span>✓ Boolean</span><span class="sp-loc">Locate</span></div>
+            <div class="sp-ans"><span>✓ Symbol</span><span class="sp-loc">Locate</span></div>
+            <div class="sp-ans"><span>✓ BigInt</span><span class="sp-loc">Locate</span></div>
+            <div class="sp-exp">Boolean, Symbol, and BigInt are primitives; Array is an Object.</div>
+          `,
+        },
+        snip: {
+          badge: 'Snip Vision • Groq Backup',
+          webHtml: `
+            <div class="w-q">3. Find hypotenuse <em>c</em> from the right triangle diagram:</div>
+            <div class="w-snip-box">
+              <span class="w-snip-tag">✂️ Snipped Area</span>
+              <svg width="160" height="96" viewBox="0 0 240 150" aria-hidden="true">
+                <polygon points="40,125 200,125 40,25" fill="rgba(99,102,241,0.2)" stroke="#818cf8" stroke-width="3" />
+                <text x="16" y="82" font-size="18" font-weight="700" fill="#f8fafc">6</text>
+                <text x="115" y="146" font-size="18" font-weight="700" fill="#f8fafc">8</text>
+                <text x="130" y="68" font-size="18" font-weight="700" fill="#38bdf8">c = ?</text>
+              </svg>
+            </div>
+            <div class="w-opt w-opt-hit"><span class="w-radio active"></span> B) 10 <span class="w-ai-tag">✓ AI</span></div>
+          `,
+          panelHtml: `
+            <div class="sp-card-top">
+              <div class="sp-badges"><span class="sp-q">Q3</span><span class="sp-type-s">Snip Vision</span></div>
+              <span class="sp-conf">High Confidence</span>
+            </div>
+            <div class="sp-qtext">Find hypotenuse c of right triangle with sides 6 and 8.</div>
+            <div class="sp-ans"><span>✓ B) 10</span><span class="sp-loc">Locate</span></div>
+            <div class="sp-exp">By Pythagoras: √(6² + 8²) = √(36 + 64) = √100 = 10.</div>
+          `,
+        },
+      };
+
+      const webContentEl = document.getElementById('demoWebContent');
+      const panelCardEl = document.getElementById('demoPanelCard');
+      const modelBadgeEl = document.getElementById('demoModelBadge');
+
+      function renderDemo(key) {
+        const d = DEMOS[key] || DEMOS.single;
+        modelBadgeEl.textContent = d.badge;
+        webContentEl.innerHTML = d.webHtml;
+        panelCardEl.innerHTML = d.panelHtml;
+        document.querySelectorAll('.demo-tab').forEach((t) => {
+          t.classList.toggle('active', t.dataset.demo === key);
+        });
+      }
+
+      document.querySelectorAll('.demo-tab').forEach((tab) => {
+        tab.addEventListener('click', () => renderDemo(tab.dataset.demo));
+      });
+      renderDemo('single');
+
+      // Subtle Scroll Reveal
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      } else {
+        document.querySelectorAll('.reveal').forEach((el) => el.classList.add('visible'));
+      }
+    </script>
+  </body>
+</html>
